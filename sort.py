@@ -14,13 +14,13 @@ class Clan:
     self.vrednost = vrednost
 
   def idiDole(self, brojevi,app):
-    for i in range(0,3):
+    for i in range(0,2):
       self.top += app.kockica
       nacrtajClanove(brojevi,app)
    
 
   def idiGore(self, brojevi,app):
-    for i in range(0,3):
+    for i in range(0,2):
       self.top -= app.kockica
       nacrtajClanove(brojevi,app)
 
@@ -31,6 +31,7 @@ class Clan:
       brojevi[indeks+pomeraj-i].left += 2*app.kockica   
       brojevi[indeks].left -= 2*app.kockica    
       nacrtajClanove(brojevi,app)
+
 
   def dodeli(self, b2):
     self.top = b2.top
@@ -45,7 +46,7 @@ def nacrtajClanove(brojevi, app):
     number_image = app.number_font.render(str(clan.vrednost), False, (0, 0, 0))
     screen.blit( number_image, ( clan.left + app.kockica//2, clan.top + app.kockica//2 ) )
   pygame.display.update()
-  pygame.time.delay(500)
+  pygame.time.delay(300)
 
  
 def zameni(brojevi,app,pomeraj,indeks):
@@ -53,11 +54,27 @@ def zameni(brojevi,app,pomeraj,indeks):
   brojevi[indeks].idiLevo( indeks, brojevi, app, pomeraj)
   brojevi[indeks].idiGore(brojevi, app)
 
+
+def b1Doleb2Gore(b1,b2, app):
+  for i in range (2):
+    b1.top += app.kockica
+    b2.top -= app.kockica
+    nacrtajClanove(brojevi, app)
+
+def idiZameniPozicije(b1, b2, pomeraj, app):
+  b1Doleb2Gore(b1,b2,app)
+  for i in range(0, pomeraj):
+      b2.left += 2*app.kockica
+      b1.left -= 2*app.kockica 
+      nacrtajClanove(brojevi, app)
+  b1Doleb2Gore(b2,b1,app)
+
+
 def definisiNiz(arr, app):
   brojevi = []
   for i in range(0, len(arr)-1):
-    left = 30+i*2*app.kockica
-    top = 30
+    left = 40+i*2*app.kockica
+    top = 100
     brojevi.append( Clan(left, top, arr[i]))
   return brojevi
 
@@ -76,6 +93,59 @@ def insertionSort(brojevi, app):
           zameni(brojevi,app,i-j-1,j+1)
 
 
+def bubbleSort(brojevi, app):
+    t= Clan(0,0,0)
+ 
+    # Traverse through all array elements
+    for i in range(len(brojevi)):
+ 
+        # Last i elements are already in place
+        for j in range(0, len(brojevi)-i-1):
+ 
+            # traverse the array from 0 to n-i-1
+            # Swap if the element found is greater
+            # than the next element
+            if brojevi[j].vrednost > brojevi[j+1].vrednost :
+                t.dodeli(brojevi[j])
+                brojevi[j].dodeli(brojevi[j+1])
+                brojevi[j+1].dodeli(t)
+                zameni(brojevi, app, 1, j)
+
+def selectionSort(brojevi, app):
+  t= Clan(0,0,0)
+  for i in range(len(brojevi)):
+        
+      # Find the minimum element in remaining 
+      # unsorted array
+      min_idx = i
+      for j in range(i+1, len(brojevi)):
+          if brojevi[min_idx].vrednost > brojevi[j].vrednost:
+              min_idx = j
+                
+      # Swap the found minimum element with 
+      # the first element        
+      t.dodeli(brojevi[i])
+      brojevi[i].dodeli(brojevi[min_idx])
+      brojevi[min_idx].dodeli(t)
+      if (min_idx-i != 0): idiZameniPozicije(brojevi[i], brojevi[min_idx], min_idx-i, app)
+
+def shellSort(brojevi, app):
+    t = Clan(0,0,0)
+
+    interval = len(brojevi) // 2
+    while interval > 0:
+        for i in range(interval, len(brojevi)):
+            t.dodeli(brojevi[i])
+            j = i
+            while j >= interval and brojevi[j - interval].vrednost> t.vrednost:
+                brojevi[j].dodeli(brojevi[j - interval])
+                j -= interval
+
+            brojevi[j].dodeli(t)
+            if (i != j): idiZameniPozicije(brojevi[j], t, interval, app)
+        interval //= 2
+
+    
 
 arr = [9,5,3,8,6,4,1,2,7,10]
 app = App()
@@ -86,11 +156,7 @@ screen.fill(app.background_colour)
 
 
 nacrtajClanove(brojevi, app)
-'''brojevi[5].idiDole(brojevi, app)
-brojevi[5].idiLevo( 5, brojevi, app, 2)
-brojevi[5].idiGore(brojevi, app)'''
-
-insertionSort(brojevi, app)
+selectionSort(brojevi, app)
 pygame.display.update() 
 running = True
 while running:
