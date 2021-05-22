@@ -28,9 +28,14 @@ class Clan:
   #pomeraj = za koliko treba da se pomeri
   def idiLevo(self, indeks, brojevi, app, pomeraj):
     for i in range(0, pomeraj):
-      brojevi[indeks-1-i].left += 2*app.kockica   
+      brojevi[indeks+pomeraj-i].left += 2*app.kockica   
       brojevi[indeks].left -= 2*app.kockica    
       nacrtajClanove(brojevi,app)
+
+  def dodeli(self, b2):
+    self.top = b2.top
+    self.left = b2.left
+    self.vrednost = b2.vrednost
 
     
 def nacrtajClanove(brojevi, app):
@@ -48,37 +53,44 @@ def zameni(brojevi,app,pomeraj,indeks):
   brojevi[indeks].idiLevo( indeks, brojevi, app, pomeraj)
   brojevi[indeks].idiGore(brojevi, app)
 
-def dodeli(b1, b2):
-  b1.top = b2.top
-  b1.left = b2.left
-  b1.vrednost = b2.vrednost
+def definisiNiz(arr, app):
+  brojevi = []
+  for i in range(0, len(arr)-1):
+    left = 30+i*2*app.kockica
+    top = 30
+    brojevi.append( Clan(left, top, arr[i]))
+  return brojevi
+
+def insertionSort(brojevi, app):
+  key = Clan(0,0,0)
+  for i in range(1, len(brojevi)):
+  
+          #jeste ocajno ali ako radi, radi
+          key.dodeli(brojevi[i])
+          j = i-1
+          while j >= 0 and key.vrednost < brojevi[j].vrednost :
+                  brojevi[j+1].dodeli(brojevi[j])
+                  j -= 1
+          brojevi[j+1].dodeli(key)
+          pomeraj = i-j-1
+          zameni(brojevi,app,i-j-1,j+1)
+
 
 
 arr = [9,5,3,8,6,4,1,2,7,10]
 app = App()
-brojevi = []
+brojevi = definisiNiz(arr, app)
 screen = pygame.display.set_mode((app.width, app.height))
 pygame.display.set_caption('insertion')
 screen.fill(app.background_colour)
-for i in range(0, len(arr)-1):
-  left = 30+i*2*app.kockica
-  top = 30
-  brojevi.append( Clan(left, top, arr[i]))
+
 
 nacrtajClanove(brojevi, app)
-brojevi[5].idiDole(brojevi, app)
+'''brojevi[5].idiDole(brojevi, app)
 brojevi[5].idiLevo( 5, brojevi, app, 2)
-brojevi[5].idiGore(brojevi, app)
+brojevi[5].idiGore(brojevi, app)'''
 
-'''for i in range(1, len(brojevi)):
- 
-        key = brojevi[i].vrednost
-        j = i-1
-        while j >= 0 and key < brojevi[j].vrednost :
-                dodeli(brojevi[j+1],brojevi[j])
-                j -= 1
-        brojevi[j+1]
-        brojevi[j + 1].vrednost = key'''
+insertionSort(brojevi, app)
 pygame.display.update() 
 running = True
 while running:
